@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Utvecklingssamtal</title>
+		<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
+	</head>
+	<body>
+    <div>F1: Konsultrollen<input type="range" min="0" max="10" id="first" onchange="window.myBar.datasets[0].bars[0].value=document.getElementById('first').value;window.myBar.update();"/></div>
+		<div style="width: 50%">
+			<canvas id="canvas" height="450" width="600"></canvas>
+		</div>
+  <table>
+    <tr>#	Konsultrollen (rådgivare, relationsbyggare, resultatskapare)</tr>
+    <tr>1	Lyssnar på kunden och förstår kundens behov</tr>
+    <tr>2	Sätter och möter kundens förväntningar</tr>
+    <tr>3	Förmåga att kommunicera och övertyga</tr>
+    <tr>4	God analysförmåga och lätthet att lösa problem</tr>
+    <tr>5	Har insikten att förankra före åtgärd</tr>
+    <tr>6	Har förståelse för egna och andra brister och möjligheter</tr>
+    <tr>7	Personlig effektivitet och framåtanda</tr>
+    <tr>8	Kreativ föreställningsförmåga (se öppet/okonventionellt)</tr>
+    <tr>9	Skicklighet att hantera mänskliga relationer</tr>
+    <tr>10	Har förmåga att sälja (baserat på förtroende)</tr>
+  </table>
+
+	<script>
+	var randomScalingFactor = function(){ return Math.round(Math.random()*10)};
+
+	var barChartData = {
+		labels : ["F1: Konsultrollen","F2: Hälsa","F3: Balans arbete/privatliv","F4: Äventyr","F5: Elixir","F6: Camel","F7: Cloud (Amazon)","F8: GA"],
+		datasets : [
+			{
+				fillColor : "rgba(220,220,220,0.5)",
+				strokeColor : "rgba(220,220,220,0.8)",
+				highlightFill: "rgba(220,220,220,0.75)",
+				highlightStroke: "rgba(220,220,220,1)",
+				data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(), randomScalingFactor(), randomScalingFactor()]
+			},
+			{
+				fillColor : "rgba(151,187,205,0.5)",
+				strokeColor : "rgba(151,187,205,0.8)",
+				highlightFill : "rgba(151,187,205,0.75)",
+				highlightStroke : "rgba(151,187,205,1)",
+				data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(), randomScalingFactor(), randomScalingFactor()]
+			}
+		]
+	};
+	window.onload = function(){
+		var ctx = document.getElementById("canvas").getContext("2d");
+		window.myBar = new Chart(ctx).Bar(barChartData, {
+			responsive : true
+		});
+		canvas.onclick = function(evt){
+    			var activeBars = myBar.getBarsAtEvent(evt);
+			activeBars.forEach(function(bar) {
+    				bar.value++;
+			});
+			myBar.update();
+    			// => activeBars is an array of bars on the canvas that are at the same position as the click event.
+			};
+		
+	};
+	</script>
+	</body>
+</html>
+
