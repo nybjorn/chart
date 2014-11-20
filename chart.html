@@ -4,25 +4,9 @@
 		<title>Utvecklingssamtal</title>
 		<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
 	</head>
-	<body>
-    <div>F1: Konsultrollen<input type="range" min="0" max="10" id="first" onchange="window.myBar.datasets[0].bars[0].value=document.getElementById('first').value;window.myBar.update();"/></div>
-		<div style="width: 50%">
+	<body>		<div style="width: 50%">
 			<canvas id="canvas" height="450" width="600"></canvas>
 		</div>
-  <table>
-    <tr>#	Konsultrollen (rådgivare, relationsbyggare, resultatskapare)</tr>
-    <tr>1	Lyssnar på kunden och förstår kundens behov</tr>
-    <tr>2	Sätter och möter kundens förväntningar</tr>
-    <tr>3	Förmåga att kommunicera och övertyga</tr>
-    <tr>4	God analysförmåga och lätthet att lösa problem</tr>
-    <tr>5	Har insikten att förankra före åtgärd</tr>
-    <tr>6	Har förståelse för egna och andra brister och möjligheter</tr>
-    <tr>7	Personlig effektivitet och framåtanda</tr>
-    <tr>8	Kreativ föreställningsförmåga (se öppet/okonventionellt)</tr>
-    <tr>9	Skicklighet att hantera mänskliga relationer</tr>
-    <tr>10	Har förmåga att sälja (baserat på förtroende)</tr>
-  </table>
-
 	<script>
 	var randomScalingFactor = function(){ return Math.round(Math.random()*10)};
 
@@ -46,20 +30,68 @@
 		]
 	};
 	window.onload = function(){
+		Chart.types.Bar.extend({
+    			name: "BarOne",
+    			initialize: function(data){
+        			Chart.types.Bar.prototype.initialize.apply(this, arguments);
+    			},
+    			getBarAtEvent : function(e){
+            			var barsArray = [],
+                		eventPosition = Chart.helpers.getRelativePosition(e),
+                		datasetIterator = function(dataset){
+                    			barsArray.push(dataset.bars[barIndex]);
+                		},
+                	barIndex;
+
+            for (var datasetIndex = 0; datasetIndex < this.datasets.length; datasetIndex++) {
+                for (barIndex = 0; barIndex < this.datasets[datasetIndex].bars.length; barIndex++) {
+                    if (this.datasets[datasetIndex].bars[barIndex].inRange(eventPosition.x,eventPosition.y)){
+
+                        //change here to only return the intrested bar not the group
+                        barsArray.push(this.datasets[datasetIndex].bars[barIndex]);
+                        return barsArray;
+                    }
+                }
+            }
+
+            return barsArray;
+        },
+
+});
 		var ctx = document.getElementById("canvas").getContext("2d");
-		window.myBar = new Chart(ctx).Bar(barChartData, {
+ 		var downBar;
+		window.myBar = new Chart(ctx).BarOne(barChartData, {
 			responsive : true
 		});
-		canvas.onclick = function(evt){
-    			var activeBars = myBar.getBarsAtEvent(evt);
+	
+        	canvas.onmousedown = function(evt){
+    			var activeBars = myBar.getBarAtEvent(evt);
 			activeBars.forEach(function(bar) {
-    				bar.value++;
+				downBar = bar;
 			});
-			myBar.update();
     			// => activeBars is an array of bars on the canvas that are at the same position as the click event.
 			};
+		canvas.onmouseup = function(evt){
+			if (downBar) {
+				pos = Chart.helpers.getRelativePosition(evt);
+				delta = Math.floor(Math.abs(downBar.y - pos.y) / 40);
+				if (delta < 1 ) delta = 1;
+    				if (downBar.y > pos.y)
+					downBar.value = downBar.value + delta;
+				else
+					downBar.value  = downBar.value - delta;
+			console.log(downBar.y - pos.y);
+			myBar.update();
+
+			}
+			downBar = null;
+			
+    			// => activeBars is an array of bars on the canvas that are at the same position as the click event.
+			};
+
 		
 	};
+
 	</script>
 	</body>
 </html>
